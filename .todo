@@ -1,0 +1,3 @@
+[ ] Make config that saves what breaks and if it plays particle or sound
+[ ] Add special edge cases for stuff items should not or should always break on (dripstone)
+[ ] Add custom shatter particle
