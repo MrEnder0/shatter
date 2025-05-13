@@ -1,17 +1,14 @@
+import {play_sound, play_particle} from "./config.js";
+
 import { world, system, EntityComponentTypes } from "@minecraft/server";
 
 const itemLastPositions = new Map();
 
-// --- Configuration ---
-// Minimum vertical speed (blocks per tick) for the breakable item to be considered for breaking.
-// 0.45 blocks/tick is equivalent to 9 blocks/second.
-// Items typically need to fall a couple of blocks to reach this speed.
+// --- Options ---
+// Minimum vertical speed (blocks per tick) for the breakable item to be considered for breaking; 0.45 blocks/tick is equivalent to 9 blocks/second.
 const VERTICAL_SPEED_THRESHOLD_TO_BREAK = 0.45;
-// Offset below the item's center (y-coordinate) to check for the ground block.
-// Item entities are 0.25 blocks tall, so their center is 0.125 blocks above their base.
-// Checking 0.2 blocks below the center ensures we're looking at the block they landed on.
+// Offset below the item's center (y-coordinate) to check for the ground block; Item entities are 0.25 blocks tall, so their center is 0.125 blocks above their base; 0.2 blocks below the center ensures we're looking at the block they landed on.
 const GROUND_CHECK_OFFSET = 0.2;
-
 // List of item IDs that should be effected by this script.
 const breakableItemTypeIds = [
     "minecraft:glass",
@@ -62,6 +59,7 @@ const breakableItemTypeIds = [
     "minecraft:brown_stained_glass_pane",
     "minecraft:tinted_glass",
 ];
+ 
 // --- End Configuration ---
 
 system.runInterval(() => {
@@ -103,8 +101,13 @@ system.runInterval(() => {
                     const blockBelow = entity.dimension.getBlock(blockLocationBelow);
 
                     if (blockBelow && !blockBelow.isAir && !blockBelow.isLiquid) {
-                        entity.dimension.playSound("random.glass", entity.location, { volume: 0.8, pitch: 1.0 });
-                        entity.dimension.spawnParticle("minecraft:basic_smoke_particle", entity.location);
+                        //world.sendMessage(`sound ${play_sound} particle ${play_particle}`); // Debug message
+                        if (play_sound == true) {
+                            entity.dimension.playSound("random.glass", entity.location, { volume: 1.0, pitch: 1.0 });
+                        }
+                        if (play_particle == true) {
+                            entity.dimension.spawnParticle("minecraft:basic_smoke_particle", entity.location);
+                        }
                         itemLastPositions.delete(entityId);
                         entity.kill();
 
@@ -120,7 +123,7 @@ system.runInterval(() => {
             if (error instanceof Error && error.stack) {
                 console.warn(error.stack);
             }
-            itemLastPositions.delete(entity.id); // Defensive removal
+            itemLastPositions.delete(entity.id); // delete bc weird
         }
     }
 }, 1);
